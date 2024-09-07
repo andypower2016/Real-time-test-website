@@ -1,21 +1,20 @@
 const ctx = document.getElementById('myChart').getContext('2d');
 
 // Initialize chart data
-const data = {
-    datasets: [{
-        label: 'Test Status',
-        data: [],
-        backgroundColor: 'yellow',
-        borderColor: 'rgba(0,0,0,0.1)',
-        borderWidth: 1,
-        pointRadius: 5,
-    }]
-};
+const data = [];
 
 // Initialize Chart.js chart
 const myChart = new Chart(ctx, {
     type: 'scatter',
-    data: data,
+    data: {
+        datasets: [{
+        label: 'Test Status',
+        data: data,
+        backgroundColor: [], // start with empty color
+        borderColor: 'rgba(0,0,0,0.1)',
+        borderWidth: 1,
+        pointRadius: 5,
+    }]},
     options: {
         scales: {
             x: {
@@ -37,9 +36,21 @@ const myChart = new Chart(ctx, {
                     text: 'Test Result'
                 }
             }
+        },
+        plugins: {
+            legend: {
+              labels: {
+                color: 'rgb(255, 99, 132)' // Color of the legend labels
+              }
+            }
         }
     }
 });
+
+// get color by logic
+const getColor = (x, y) => {
+    return y == 'test pass' ? 'green' : 'red';
+};
 
 // Establish WebSocket connection
 const socket = new WebSocket('ws://localhost:8080'); // Ensure this URL matches your WebSocket server
@@ -71,13 +82,17 @@ socket.onmessage = function(event) {
         const xValue = new Date(newData.timestamp);
 
         // Add new data point to chart
-        myChart.data.datasets[0].data.push({
+        const newPoint = {
             x: xValue,
             y: yValue
-        });
+        };
+
+        myChart.data.datasets[0].data.push(newPoint);
+        myChart.data.datasets[0].backgroundColor.push(getColor(newPoint.x, newPoint.y));
 
         // Update chart without animation for real-time performance
-        myChart.update('none');
+        // myChart.update('none');
+        myChart.update();
     } catch (error) {
         console.error('Error processing WebSocket message:', error);
     }

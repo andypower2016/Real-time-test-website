@@ -48,7 +48,7 @@ function getRandomZeroOrOne() {
 function generateRandomData() {
     const results = ['test pass', 'test fail'];
     const idx = getRandomZeroOrOne()
-    console.log(idx)
+    console.log('Current test stats: ' + idx)
     const randomResult = results[idx];
     const timestamp = new Date().toISOString();
     return JSON.stringify({ result: randomResult, timestamp: timestamp });
